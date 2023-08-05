@@ -6,25 +6,25 @@
 // promiseReduce последовательно вызывает переданные асинхронные функции
 // и выполняет reduce функцию сразу при получении результата до вызова следующей асинхронной функции. Функция promiseReduce должна возвращать промис с конечным результатом.
 
-const fn1 = () => {
+const fn2 = () => {
   return Promise.resolve(3);
 };
 
-const fn2 = () =>
+const fn1 = () =>
   new Promise((resolve) => {
-    setTimeout(() => resolve(2), 1000);
+    setTimeout(() => resolve(2), 5000);
   });
 
-const promiseReduce = (asyncFunctions, reduceFn, initialValue) => {
-  return asyncFunctions.reduce(async (acc, asyncFunction) => {
-    const awaitedAcc = await acc;
+const promiseReduce = async (asyncFunctions, reduceFn, initialValue) => {
+  let sum = initialValue
 
+  for await (const asyncFunction of asyncFunctions) {
     const resultFromAsyncFunction = await asyncFunction();
 
-    const result = reduceFn(awaitedAcc, resultFromAsyncFunction);
+    sum = sum + resultFromAsyncFunction
+  }
 
-    return result;
-  }, initialValue);
+  return sum
 };
 
 promiseReduce(
